@@ -38,14 +38,13 @@ app.get('/api/allMinors', function(req, res) {
 app.get('/api/bestMinors', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
-  connection.query(`select newMinors.team, count(distinct newPlayerMaster.playerID) as playerCount, newPlayerMaster.franchise
+  connection.query(`select newMinors.team, count(distinct newPlayerMaster.playerID) as playerCount, newPlayerMaster.franchise, newPlayerMaster.yr
 from newPlayerMaster, newMinors
 where newPlayerMaster.classes REGEXP ? 
 and newMinors.class = ?
 and newMinors.franchise = newPlayerMaster.franchise
-and newPlayerMaster.yr = ?
-group by newMinors.team
-order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p, 2013], function (error, results, fields) {
+group by newMinors.team, newPlayerMaster.yr
+order by newPlayerMaster.yr, count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p], function (error, results, fields) {
     console.log(results)
       res.json(results)
     connection.release();
