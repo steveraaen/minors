@@ -35,6 +35,7 @@ app.get('/api/allMinors', function(req, res) {
    });
  });
 })
+// Find out which minor league team has produced the most majora leaguers in year xxxx
 app.get('/api/bestMinors', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
