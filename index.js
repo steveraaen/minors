@@ -35,7 +35,7 @@ app.get('/api/allMinors', function(req, res) {
    });
  });
 })
-// Find out which minor league team has produced the most majora leaguers in year xxxx
+// Find out which minor league team has produced the most major leaguers in year xxxx
 app.get('/api/bestMinors', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
@@ -55,9 +55,40 @@ order by newPlayerMaster.yr, count(newPlayerMaster.playerName) desc`, [req.query
    });
  });
 })
+// Get leagues for each class
+/*app.get('/api/leagues', function(req, res) {
+  pool.getConnection(function(err, connection) {
+  connection.query('select * from newMinors where franchise IS NOT NULL', function (error, results, fields) {
+    console.log(results)
+      res.json(results)
+    connection.release();
 
+    if (error) throw error;
+   });
+ });
+})*/
 
 
 const port = process.env.PORT || 5001;
 app.listen(port);
 console.log(`Listening on ${port}`);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
