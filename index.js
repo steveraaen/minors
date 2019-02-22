@@ -43,10 +43,10 @@ app.get('/api/bestMinors', function(req, res) {
 from newPlayerMaster, newMinors
 where newPlayerMaster.classes REGEXP ? 
 and newMinors.class = ?
-and newPlayerMaster.yr = 2013
+and newPlayerMaster.yr = ?
 and newMinors.franchise = newPlayerMaster.franchise
 group by newMinors.team, newPlayerMaster.yr
-order by newPlayerMaster.yr, count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p], function (error, results, fields) {
+order by newPlayerMaster.yr, count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p,req.query.y], function (error, results, fields) {
     console.log(results)
       res.json(results)
     connection.release();
