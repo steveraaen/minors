@@ -2,7 +2,8 @@
 require('dotenv').config()
 const express = require('express')
 const mysql = require('mysql')
-
+const cheerio = require('cheerio')
+const request = require('request')
 const app = express()
 
 
@@ -16,11 +17,11 @@ var pool  = mysql.createPool({
 app.get('/api/summary', function(req, res) {
 	pool.getConnection(function(err, connection) {
   connection.query('select year, minorTeam,  count(player), franchise, class from supermaster  group by minorTeam , year order by count(player) desc', function (error, results, fields) {
-    console.log(results)
-    	res.json(results)
+
     connection.release();
 
     if (error) throw error;
+
    });
  });
 })
@@ -45,8 +46,8 @@ where newPlayerMaster.classes REGEXP ?
 and newMinors.class = ?
 and newPlayerMaster.yr = ?
 and newMinors.franchise = newPlayerMaster.franchise
-group by newMinors.team, newPlayerMaster.yr
-order by newPlayerMaster.yr, count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p,req.query.y], function (error, results, fields) {
+group by newMinors.team
+order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p, req.query.y], function (error, results, fields) {
     console.log(results)
       res.json(results)
     connection.release();
@@ -66,6 +67,35 @@ order by newPlayerMaster.yr, count(newPlayerMaster.playerName) desc`, [req.query
     if (error) throw error;
    });
  });
+})*/
+// scraper
+ 
+/*app.get('/api/setLogos', function(req, res) {
+  pool.getConnection(function(err, connection) {
+    request({
+        method: 'GET',
+        url: 'http://www.sportslogos.net/teams/list_by_league/48/Appalachian_League/AppL/logos/'
+    }, (err, res, body) => {
+      var codes=[]
+       const $ = cheerio.load(body);
+        $('#team > .logoWall li').each(function(i, e) {
+          var result ={}
+          var anchr = $(this).children('a')
+          result.class = "Rk"
+          result.league = "Appalachian"
+          result.title = anchr.attr('title').replace(/ Logos/, "")
+          result.image = anchr.find('img').attr('src')
+
+          connection.query(`INSERT INTO minorLogos (class, league, teamName, imageUrl)VALUES (?,?,?,?)`, [result.class ,result.league, result.title ,result.image], function (error) {
+
+    if (error) throw error;
+                console.log('results')
+            
+         });                  
+       })  
+        connection.release();
+    })
+  })
 })*/
 
 
