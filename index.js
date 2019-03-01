@@ -59,13 +59,16 @@ order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p, req
 app.get('/api/playerList', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
-  connection.query(`select distinct newPlayerMaster.playerName
-from newPlayerMaster, players18 
-where newPlayerMaster.classes REGEXP ?
-and players18.playercode = newPlayerMaster.playerID
-and newPlayerMaster.franchise = ?
-and newPlayerMaster.yr = ?`, [req.query.r, req.query.f, req.query.y], function (error, results, fields) {
-    console.log(results)
+  connection.query(`select distinct newPlayerMaster.playerName, batting18.G, 
+    batting18.AB, batting18.H, (batting18.AB/batting18.H) as AVG, batting18.2B, batting18.3B, batting18.HR,
+    batting18.RBI, batting18.SB, batting18.BB, batting18.SO, batting18.HBP
+    from newPlayerMaster, batting18 
+    where newPlayerMaster.classes REGEXP ?
+    and batting18.playerID = newPlayerMaster.playerID
+    and newPlayerMaster.franchise = ?
+    and newPlayerMaster.yr = ?
+    order by AB desc `, [req.query.r, req.query.f, req.query.y], function (error, results, fields) {
+        console.log(results)
       res.json(results)
     connection.release();
 
