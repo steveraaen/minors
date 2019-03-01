@@ -40,7 +40,7 @@ app.get('/api/allMinors', function(req, res) {
 app.get('/api/bestMinors', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
-  connection.query(`select newMinors.team, count(distinct newPlayerMaster.playerID) as playerCount, newPlayerMaster.franchise, newPlayerMaster.yr
+  connection.query(`select newMinors.team, newMinors.logo, count(distinct newPlayerMaster.playerID) as playerCount, newPlayerMaster.franchise, newPlayerMaster.yr
 from newPlayerMaster, newMinors
 where newPlayerMaster.classes REGEXP ? 
 and newMinors.class = ?
@@ -48,6 +48,23 @@ and newPlayerMaster.yr = ?
 and newMinors.franchise = newPlayerMaster.franchise
 group by newMinors.team
 order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p, req.query.y], function (error, results, fields) {
+    console.log(results)
+      res.json(results)
+    connection.release();
+
+    if (error) throw error;
+   });
+ });
+})
+app.get('/api/playerList', function(req, res) {
+  console.log(req.query)
+  pool.getConnection(function(err, connection) {
+  connection.query(`select distinct newPlayerMaster.playerName
+from newPlayerMaster, players18 
+where newPlayerMaster.classes REGEXP ?
+and players18.playercode = newPlayerMaster.playerID
+and newPlayerMaster.franchise = ?
+and newPlayerMaster.yr = ?`, [req.query.r, req.query.f, req.query.y], function (error, results, fields) {
     console.log(results)
       res.json(results)
     connection.release();

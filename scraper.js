@@ -14,6 +14,7 @@ const fs = require('fs')
         	var result ={}
         	var anchr = $(this).children('a')
         	result.class = "AAA"
+        	result.league = "International"
         result.title = anchr.attr('title').replace(/ Logos/, "")
         result.image = anchr.find('img').attr('src')
  			codes.push(JSON.stringify(result))     		        
