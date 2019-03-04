@@ -41,13 +41,15 @@ app.get('/api/bestMinors', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
   connection.query(`select newMinors.team, newMinors.logo, count(distinct newPlayerMaster.playerID) as playerCount, newPlayerMaster.franchise, newPlayerMaster.yr
-from newPlayerMaster, newMinors
+from newPlayerMaster, newMinors, batting18
 where newPlayerMaster.classes REGEXP ? 
+and batting18.teamID = newPlayerMaster.franchise
+and batting18.lgID REGEXP ?
 and newMinors.class = ?
 and newPlayerMaster.yr = ?
 and newMinors.franchise = newPlayerMaster.franchise
 group by newMinors.team
-order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.p, req.query.y], function (error, results, fields) {
+order by count(newPlayerMaster.playerName) desc`, [req.query.m, "L", req.query.p, req.query.y], function (error, results, fields) {
     console.log(results)
       res.json(results)
     connection.release();
@@ -60,7 +62,8 @@ app.get('/api/playerList', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
   connection.query(`select distinct newPlayerMaster.playerName, batting18.G, 
-    batting18.AB, batting18.H, (batting18.AB/batting18.H) as AVG, batting18.2B, batting18.3B, batting18.HR,
+    batting18.AB, batting18.H, (batting18.H/batting18.AB) as AVG, batting18.2B, 
+    batting18.3B, batting18.HR, batting18.teamID,
     batting18.RBI, batting18.SB, batting18.BB, batting18.SO, batting18.HBP
     from newPlayerMaster, batting18 
     where newPlayerMaster.classes REGEXP ?
@@ -76,18 +79,7 @@ app.get('/api/playerList', function(req, res) {
    });
  });
 })
-// Get leagues for each class
-/*app.get('/api/leagues', function(req, res) {
-  pool.getConnection(function(err, connection) {
-  connection.query('select * from newMinors where franchise IS NOT NULL', function (error, results, fields) {
-    console.log(results)
-      res.json(results)
-    connection.release();
 
-    if (error) throw error;
-   });
- });
-})*/
 // scraper
  
 /*app.get('/api/setLogos', function(req, res) {
