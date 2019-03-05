@@ -49,8 +49,8 @@ and newMinors.class = ?
 and newPlayerMaster.yr = ?
 and newMinors.franchise = newPlayerMaster.franchise
 group by newMinors.team
-order by count(newPlayerMaster.playerName) desc`, [req.query.m, "L", req.query.p, req.query.y], function (error, results, fields) {
-    console.log(results)
+order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.d, req.query.p, req.query.y], function (error, results, fields) {
+   /* console.log(results)*/
       res.json(results)
     connection.release();
 
