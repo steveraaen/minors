@@ -58,7 +58,7 @@ order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.d, req
    });
  });
 })
-app.get('/api/playerList', function(req, res) {
+app.get('/api/batterList', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
   connection.query(`select distinct newPlayerMaster.playerName, batting18.G, 
@@ -71,6 +71,7 @@ app.get('/api/playerList', function(req, res) {
     and newPlayerMaster.franchise = ?
     and newPlayerMaster.yr = ?
     order by AB desc `, [req.query.r, req.query.f, req.query.y], function (error, results, fields) {
+
         console.log(results)
       res.json(results)
     connection.release();
@@ -79,7 +80,28 @@ app.get('/api/playerList', function(req, res) {
    });
  });
 })
+app.get('/api/pitcherList', function(req, res) {
+  console.log(req.query)
+  pool.getConnection(function(err, connection) {
+  connection.query(`select distinct newPlayerMaster.playerName, pitching18.G, 
+    (pitching18.IPouts / 3) as IP, pitching18.W, pitching18.L, 
+    pitching18.GS, pitching18.SV, pitching18.teamID,
+    pitching18.H, pitching18.ER, pitching18.BB, pitching18.SO, pitching18.HBP
+    from newPlayerMaster, pitching18 
+    where newPlayerMaster.classes REGEXP ?
+    and pitching18.playerID = newPlayerMaster.playerID
+    and newPlayerMaster.franchise = ?
+    and newPlayerMaster.yr = ?
+    order by (pitching18.IPouts / 3) desc `, [req.query.r, req.query.f, req.query.y], function (error, results, fields) {
 
+        console.log(results)
+      res.json(results)
+    connection.release();
+
+    if (error) throw error;
+   });
+ });
+})
 // scraper
  
 /*app.get('/api/setLogos', function(req, res) {
