@@ -38,7 +38,7 @@ app.get('/api/allMinors', function(req, res) {
 })
 // Find out which minor league team has produced the most major leaguers in year xxxx
 app.get('/api/bestMinors', function(req, res) {
-  console.log(req.query)
+ /* console.log(req.query)*/
   pool.getConnection(function(err, connection) {
   connection.query(`select newMinors.team, newMinors.logo, count(distinct newPlayerMaster.playerID) as playerCount, newPlayerMaster.franchise, newPlayerMaster.yr
 from newPlayerMaster, newMinors, batting18
@@ -59,7 +59,7 @@ order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.d, req
  });
 })
 app.get('/api/batterList', function(req, res) {
-  console.log(req.query)
+ /* console.log(req.query)*/
   pool.getConnection(function(err, connection) {
   connection.query(`select distinct newPlayerMaster.playerName, batting18.G, 
     batting18.AB, batting18.H, (batting18.H/batting18.AB) as AVG, batting18.2B, 
@@ -72,7 +72,7 @@ app.get('/api/batterList', function(req, res) {
     and newPlayerMaster.yr = ?
     order by AB desc `, [req.query.r, req.query.f, req.query.y], function (error, results, fields) {
 
-        console.log(results)
+    /*    console.log(results)*/
       res.json(results)
     connection.release();
 
@@ -84,8 +84,8 @@ app.get('/api/pitcherList', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
   connection.query(`select distinct newPlayerMaster.playerName, pitching18.G, 
-    (pitching18.IPouts / 3) as IP, pitching18.W, pitching18.L, 
-    pitching18.GS, pitching18.SV, pitching18.teamID,
+    (pitching18.IPouts / 3) as IP, pitching18.W, pitching18.L, pitching18.IBB,
+    pitching18.IBB,pitching18.GF, pitching18.GS, pitching18.SV, pitching18.teamID,
     pitching18.H, pitching18.ER, pitching18.BB, pitching18.SO, pitching18.HBP
     from newPlayerMaster, pitching18 
     where newPlayerMaster.classes REGEXP ?
@@ -94,7 +94,7 @@ app.get('/api/pitcherList', function(req, res) {
     and newPlayerMaster.yr = ?
     order by (pitching18.IPouts / 3) desc `, [req.query.r, req.query.f, req.query.y], function (error, results, fields) {
 
-        console.log(results)
+    /*    console.log(results)*/
       res.json(results)
     connection.release();
 
@@ -102,6 +102,26 @@ app.get('/api/pitcherList', function(req, res) {
    });
  });
 })
+
+app.get('/api/sendStats', function(req, res) {
+ var btr = JSON.parse(req.query.ba)
+ var ptc = JSON.parse(req.query.pi)
+ var tm = JSON.parse(req.query.tm)
+  pool.getConnection(function(err, connection) {
+  connection.query(`INSERT INTO overall18 (milbTeam, logo, color, franchiseLogo, yr, className, bAB, bBA, bBB, bH, bHBP, bHR, bSB, bSO, bG, pBB,
+     pER, pERA, pG, pGS, pH, pIP, pL, pSO, pSV, pW ,pHBP, pIBB)VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, 
+     [tm.name, tm.logo, tm.color, tm.franchiseLogo, req.query.yr, req.query.cl, btr.AB, btr.AVG, btr.BB,  btr.H, btr.HBP, btr.HR, btr.SB, btr.SO,btr.G,
+     ptc.BB, ptc.ER, ptc.ERA, ptc.G, ptc.GS, ptc.H, ptc.IP, ptc.L, ptc.SO, ptc.SV, ptc.W, ptc.HBP, ptc.IBB ], function (error, results, fields) {
+
+        console.log('results')
+      res.json('results')
+    connection.release();
+
+    if (error) throw error;
+   });
+ });
+})
+
 // scraper
  
 /*app.get('/api/setLogos', function(req, res) {
