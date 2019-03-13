@@ -12,7 +12,8 @@ var pool  = mysql.createPool({
     port: '3306',
     user: 'tranch5_sjr',
     password: process.env.DB_PW,
-    database: 'tranch5_milb'
+    database: 'tranch5_milb',
+     multipleStatements: true
 });
 app.get('/api/summary', function(req, res) {
 	pool.getConnection(function(err, connection) {
@@ -61,7 +62,7 @@ order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.d, req
 app.get('/api/batterList', function(req, res) {
  /* console.log(req.query)*/
   pool.getConnection(function(err, connection) {
-  connection.query(`select distinct newPlayerMaster.playerName, batting18.G, 
+  connection.query(`select distinct newPlayerMaster.playerName, batting18.lgID, batting18.G, 
     batting18.AB, batting18.H, (batting18.H/batting18.AB) as AVG, batting18.2B, 
     batting18.3B, batting18.HR, batting18.teamID,
     batting18.RBI, batting18.SB, batting18.BB, batting18.SO, batting18.HBP
@@ -83,7 +84,7 @@ app.get('/api/batterList', function(req, res) {
 app.get('/api/pitcherList', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
-  connection.query(`select distinct newPlayerMaster.playerName, pitching18.G, 
+  connection.query(`select distinct newPlayerMaster.playerName, pitching18.lgID, pitching18.G, 
     (pitching18.IPouts / 3) as IP, pitching18.W, pitching18.L, pitching18.IBB,
     pitching18.IBB,pitching18.GF, pitching18.GS, pitching18.SV, pitching18.teamID,
     pitching18.H, pitching18.ER, pitching18.BB, pitching18.SO, pitching18.HBP
@@ -100,17 +101,48 @@ app.get('/api/pitcherList', function(req, res) {
 
     if (error) throw error;
    });
+ });        
+})
+app.get('/api/topBatting', function(req, res) {
+  pool.getConnection(function(err, connection) {
+  connection.query(`select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
+                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
+                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;
+                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;
+                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;`, ['Triple-A','Double-A','Class A','Class A Advanced','Class A Short'], function (error, results, fields) {
+    console.log(results)
+      res.json(results)
+    connection.release();
+
+    if (error) throw error;
+   });
+ });
+})
+app.get('/api/topPitching', function(req, res) {
+  pool.getConnection(function(err, connection) {
+  connection.query(`select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
+                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
+                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;
+                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;
+                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;`, ['Triple-A','Double-A','Class A','Class A Advanced','Class A Short'], function (error, results, fields) {
+    console.log(results)
+      res.json(results)
+    connection.release();
+
+    if (error) throw error;
+   });
  });
 })
 
-app.get('/api/sendStats', function(req, res) {
+// Use once to aggregate stats
+/*app.get('/api/sendStats', function(req, res) {
  var btr = JSON.parse(req.query.ba)
  var ptc = JSON.parse(req.query.pi)
  var tm = JSON.parse(req.query.tm)
   pool.getConnection(function(err, connection) {
-  connection.query(`INSERT INTO overall18 (milbTeam, logo, color, franchiseLogo, yr, className, bAB, bBA, bBB, bH, bHBP, bHR, bSB, bSO, bG, pBB,
-     pER, pERA, pG, pGS, pH, pIP, pL, pSO, pSV, pW ,pHBP, pIBB)VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, 
-     [tm.name, tm.logo, tm.color, tm.franchiseLogo, req.query.yr, req.query.cl, btr.AB, btr.AVG, btr.BB,  btr.H, btr.HBP, btr.HR, btr.SB, btr.SO,btr.G,
+  connection.query(`INSERT INTO overall18 (milbTeam, logo, color, franchiseLogo, yr, className, division, bAB, bBA, bBB, bH, bHBP, bHR, bSB, bSO, bG, pBB,
+     pER, pERA, pG, pGS, pH, pIP, pL, pSO, pSV, pW ,pHBP, pIBB)VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, 
+     [tm.name, tm.logo, tm.color, tm.franchiseLogo, req.query.yr, req.query.dv, req.query.cl, btr.AB, btr.AVG, btr.BB,  btr.H, btr.HBP, btr.HR, btr.SB, btr.SO,btr.G,
      ptc.BB, ptc.ER, ptc.ERA, ptc.G, ptc.GS, ptc.H, ptc.IP, ptc.L, ptc.SO, ptc.SV, ptc.W, ptc.HBP, ptc.IBB ], function (error, results, fields) {
 
         console.log('results')
@@ -120,7 +152,7 @@ app.get('/api/sendStats', function(req, res) {
     if (error) throw error;
    });
  });
-})
+})*/
 
 // scraper
  
