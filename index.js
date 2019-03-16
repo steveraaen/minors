@@ -29,7 +29,7 @@ app.get('/api/summary', function(req, res) {
 app.get('/api/allMinors', function(req, res) {
 	pool.getConnection(function(err, connection) {
   connection.query('select * from newMinors where franchise IS NOT NULL', function (error, results, fields) {
-    console.log(results)
+ /*   console.log(results)*/
     	res.json(results)
     connection.release();
 
@@ -103,13 +103,13 @@ app.get('/api/pitcherList', function(req, res) {
    });
  });        
 })
-app.get('/api/topBatting', function(req, res) {
+/*app.get('/api/topBatting', function(req, res) {
   pool.getConnection(function(err, connection) {
-  connection.query(`select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
-                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
-                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;
-                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;
-                    select className as cl, logo, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;`, ['Triple-A','Double-A','Class A','Class A Advanced','Class A Short'], function (error, results, fields) {
+  connection.query(`select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
+                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
+                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;
+                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;
+                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 200  order by bBA desc limit 5;`, ['Triple-A','Double-A','Class A','Class A Advanced','Class A Short'], function (error, results, fields) {
     console.log(results)
       res.json(results)
     connection.release();
@@ -120,20 +120,31 @@ app.get('/api/topBatting', function(req, res) {
 })
 app.get('/api/topPitching', function(req, res) {
   pool.getConnection(function(err, connection) {
-  connection.query(`select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
-                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
-                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;
-                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;
-                    select className as cl, logo, milbTeam, yr, pG, pW, pL, pSV, pER, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;`, ['Triple-A','Double-A','Class A','Class A Advanced','Class A Short'], function (error, results, fields) {
+  connection.query(`select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
+                    select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
+                    select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;
+                    select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;
+                    select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and pIP > 150  order by pER limit 5;`, ['Triple-A','Double-A','Class A','Class A Advanced','Class A Short'], function (error, results, fields) {
     console.log(results)
       res.json(results)
     connection.release();
-
+    if (error) throw error;
+   });
+ });
+})*/
+app.get('/api/classSummary', function(req, res) {
+  console.log(req.query)
+  pool.getConnection(function(err, connection) {
+  connection.query(`select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
+                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
+ `, [req.query.cl, req.query.cl], function (error, results, fields) {
+ 
+      res.json(results)
+    connection.release();
     if (error) throw error;
    });
  });
 })
-
 // Use once to aggregate stats
 /*app.get('/api/sendStats', function(req, res) {
  var btr = JSON.parse(req.query.ba)
