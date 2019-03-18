@@ -82,7 +82,7 @@ app.get('/api/batterList', function(req, res) {
  });
 })
 app.get('/api/pitcherList', function(req, res) {
-  console.log(req.query)
+/*  console.log(req.query)*/
   pool.getConnection(function(err, connection) {
   connection.query(`select distinct newPlayerMaster.playerName, pitching18.lgID, pitching18.G, 
     (pitching18.IPouts / 3) as IP, pitching18.W, pitching18.L, pitching18.IBB,
@@ -135,10 +135,10 @@ app.get('/api/topPitching', function(req, res) {
 app.get('/api/classSummary', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
-  connection.query(`select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and pIP > 300  order by pER limit 5;
-                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and bAB > 1000  order by bBA desc limit 5;
- `, [req.query.cl, req.query.cl], function (error, results, fields) {
- 
+  connection.query(`select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and divID like ? and yr like ?  and pIP > 300  order by pER limit 5;
+                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and divID like ? and yr like ?  and bAB > 1000  order by bBA desc limit 5;`, 
+                    [req.query.cl, req.query.dv, req.query.yr, req.query.cl, req.query.dv, req.query.yr ], function (error, results, fields) {
+       console.log(results)
       res.json(results)
     connection.release();
     if (error) throw error;
