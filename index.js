@@ -60,9 +60,9 @@ order by count(newPlayerMaster.playerName) desc`, [req.query.m, req.query.d, req
  });
 })
 app.get('/api/batterList', function(req, res) {
- /* console.log(req.query)*/
+/*  console.log(req.query)*/
   pool.getConnection(function(err, connection) {
-  connection.query(`select distinct newPlayerMaster.playerName, batting18.lgID, batting18.G, 
+  connection.query(`select distinct newPlayerMaster.playerName, newPlayerMaster.yr AS YR, batting18.lgID, batting18.G, 
     batting18.AB, batting18.H, (batting18.H/batting18.AB) as AVG, batting18.2B, 
     batting18.3B, batting18.HR, batting18.teamID,
     batting18.RBI, batting18.SB, batting18.BB, batting18.SO, batting18.HBP
@@ -84,7 +84,7 @@ app.get('/api/batterList', function(req, res) {
 app.get('/api/pitcherList', function(req, res) {
 /*  console.log(req.query)*/
   pool.getConnection(function(err, connection) {
-  connection.query(`select distinct newPlayerMaster.playerName, pitching18.lgID, pitching18.G, 
+  connection.query(`select distinct newPlayerMaster.playerName, newPlayerMaster.yr AS YR, pitching18.lgID, pitching18.G, 
     (pitching18.IPouts / 3) as IP, pitching18.W, pitching18.L, pitching18.IBB,
     pitching18.IBB,pitching18.GF, pitching18.GS, pitching18.SV, pitching18.teamID,
     pitching18.H, pitching18.ER, pitching18.BB, pitching18.SO, pitching18.HBP
@@ -135,10 +135,10 @@ app.get('/api/topPitching', function(req, res) {
 app.get('/api/classSummary', function(req, res) {
   console.log(req.query)
   pool.getConnection(function(err, connection) {
-  connection.query(`select className as cl, logo, color, milbTeam, yr, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className = ? and divID like ? and yr like ?  and pIP > 300  order by pER limit 5;
-                    select className as cl, logo, color, milbTeam, yr, bG, bAB, bBA, bHR, bSO, majteam, franchiseLogo from summary18 where className = ? and divID like ? and yr like ?  and bAB > 1000  order by bBA desc limit 5;`, 
+  connection.query(`select  className as cl, logo, color, milbTeam, yr, division, 9 * (pER / pIP) as pERA, pG, pW, pL, pSV, pER, pIP, majteam, franchiseLogo from summary18 where className like ? and divID like ? and yr like ?   order by pIP desc limit 20 ;
+                    select className as cl, logo, color, milbTeam, yr, division, bG, bH, bAB, bBA, bHR, bSO, bBB, majteam, franchiseLogo from summary18 where className like ? and divID like ? and yr like ?  order by bH desc limit 20 ;`, 
                     [req.query.cl, req.query.dv, req.query.yr, req.query.cl, req.query.dv, req.query.yr ], function (error, results, fields) {
-       console.log(results)
+      /* console.log(results)*/
       res.json(results)
     connection.release();
     if (error) throw error;
