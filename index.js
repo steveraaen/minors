@@ -8,6 +8,11 @@ const request = require('request')
 const app = express()
 
 app.use(express.static(path.join(__dirname, 'client/build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
+
 console.log(__dirname)
 var pool  = mysql.createPool({
     host: process.env.DB_HOST,
@@ -195,7 +200,6 @@ app.get('/api/classSummary', function(req, res) {
     })
   })
 })*/
-
 
 const port = process.env.PORT || 5001;
 app.listen(port);
