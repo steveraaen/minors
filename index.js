@@ -15,8 +15,8 @@ const app = express()
 /*  const path = require('path');
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  });
-}*/
+  });*/
+}
 
 console.log(process.env)
 var pool  = mysql.createPool({
