@@ -7,16 +7,9 @@ const cheerio = require('cheerio')
 const request = require('request')
 const app = express()
 
-   if (process.env.NODE_ENV === 'production') {
-  // Exprees will serve up production assets
-  app.use(express.static('client/build'));
-
-  // Express serve up index.html file if it doesn't recognize route
-/*  const path = require('path');
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  });*/
-}
+app.get('/', function (req, res) {
+  res.send('root')
+})
 
 console.log(process.env)
 var pool  = mysql.createPool({
@@ -27,6 +20,8 @@ var pool  = mysql.createPool({
     database: 'tranch5_milb',
      multipleStatements: true
 });
+
+
 app.get('/api/summary', function(req, res) {
 	pool.getConnection(function(err, connection) {
   connection.query('select year, minorTeam,  count(player), franchise, class from supermaster  group by minorTeam , year order by count(player) desc', function (error, results, fields) {
