@@ -7,7 +7,7 @@ const cheerio = require('cheerio')
 const request = require('request')
 const app = express()
 
-app.use(express.static(path.join(__dirname, 'client/build')));
+/*app.use(express.static(path.join(__dirname, 'client/build')));*/
 console.log(__dirname)
 var pool  = mysql.createPool({
     host: process.env.DB_HOST,
