@@ -7,7 +7,20 @@ const cheerio = require('cheerio')
 const request = require('request')
 const app = express()
 
+app.use(express.static(path.join(__dirname, 'client/build')));
 
+//production mode
+if(process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'client/build')));
+  //
+  app.get('*', (req, res) => {
+    res.sendfile(path.join(__dirname = 'client/build/index.html'));
+  })
+}
+//build mode
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/public/index.html'));
+})
 
 console.log(__dirname)
 var pool  = mysql.createPool({
