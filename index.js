@@ -1,14 +1,18 @@
 
 require('dotenv').config()
 const express = require('express')
-const path = require('path');
+const path = require('path')
 const mysql = require('mysql')
 const cheerio = require('cheerio')
 const request = require('request')
 const app = express()
 
+app.use(express.static(path.join(__dirname, 'build')));
 
-console.log(__dirname)
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 var pool  = mysql.createPool({
     host: process.env.DB_HOST,
     port: '3306',
@@ -20,6 +24,7 @@ var pool  = mysql.createPool({
 app.get('/api/summary', function(req, res) {
 	pool.getConnection(function(err, connection) {
   connection.query('select year, minorTeam,  count(player), franchise, class from supermaster  group by minorTeam , year order by count(player) desc', function (error, results, fields) {
+
     connection.release();
 
     if (error) throw error;
@@ -195,9 +200,7 @@ app.get('/api/classSummary', function(req, res) {
     })
   })
 })*/
-app.get('/', (req, res) => {
-  res.sendFile(path.join('/client/build/index.html'));
-});
+
 
 const port = process.env.PORT || 5001;
 app.listen(port);
