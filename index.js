@@ -9,10 +9,6 @@ const app = express()
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-});
-
 var pool  = mysql.createPool({
     host: process.env.DB_HOST,
     port: '3306',
